@@ -14,8 +14,7 @@ use App\Http\Controllers\UserController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-// Route::get('/users', [UserController::class, 'index']);
-
+Route::get('/users', [UserController::class, 'index']);
 Route::post('/createUser', [UserController::class, 'store']);
+Route::post('/userUpdate/{id}', [UserController::class, 'update']);
 Route::post('/login', [UserController::class, 'login']);

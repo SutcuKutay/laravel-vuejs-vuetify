@@ -12,33 +12,38 @@ class UserController extends Controller
 {
     protected $user;
 
-    // public function __construct()
-    // {
-    //     $this->user = new User();
-    // }
-
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        // $user = User::all();
-        // return $user;
-        return DB::table('users')->select('id', 'name', 'email', 'password')->get();
+        $user = User::all();
+        return $user;
     }
 
     public function login(Request $request)
     {
-        $credentials = [
-            'name' => $request->name,
-            'password' => $request->password,
-        ];
-
-        if (Auth::attempt($credentials)) {
-            return redirect('/')->with('success', 'Login successful');
+        $user = User::where('email', $request->email)->get();
+        if ($user) {
+            foreach ($user as $key) {
+                if (Hash::check($request->password, $key->password)) {
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'User Login succesfully',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => 500,
+                        'message' => 'Password is incorrect',
+                    ], 500);
+                }
+            }
+        } else {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Email is incorrect',
+            ], 500);
         }
-
-        return back()->with('error', 'Name or password is incorrect');
     }
 
     /**
@@ -46,30 +51,12 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // $user = User::create([
-        //     'name' => $request->name,
-        //     'email' => $request->email,
-        //     'password' => $request->password,
-        // ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
 
-        // if($user){
-        //     return response()->json([
-        //         'status' => 200,
-        //         'message' => 'User added succesfully',
-        //     ], 200);
-        // }
-        // else{
-        //     return response()->json([
-        //         'status' => 500,
-        //         'message' => 'Something went wrong',
-        //     ], 500);
-        // }
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-
-        $user->save();
         if ($user) {
             return response()->json([
                 'status' => 200,
@@ -96,7 +83,11 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        //Just controlling the api system, no real database actions
+        return response()->json([
+            'status' => 200,
+            'message' => 'User update succesfully',
+        ], 200);
     }
 
     /**
